@@ -1776,3 +1776,33 @@ h1, h2, h3, h4, h5, h6 {
     padding: var(--space-6) var(--space-4);
   }
 }
+
+/* ============================================================
+   21. FOOTER (Tarefa 8 - Finalizado)
+   ============================================================ */
+.site-footer {
+  background: var(--color-navy-deep);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-block: var(--space-8);
+  color: var(--color-gray-400);
+  text-align: center;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer-legal {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.02em;
+  line-height: var(--lh-relaxed);
+  color: rgba(255, 255, 255, 0.45);
+}
+
+@media (max-width: 768px) {
+  .site-footer {
+    padding-block: var(--space-6);
+  }
+}

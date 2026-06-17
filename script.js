@@ -117,6 +117,8 @@ const translations = {
     contact_form_sending:  'Enviando...',
     contact_success_title: 'Solicitação Enviada!',
     contact_success_msg:   'Solicitação recebida! Nossa equipe de especialistas entrará em contato em até 24 horas.',
+    contact_form_tax_id:   'CNPJ',
+    footer_legal:          '© {year} VIATRADE Group. Todos os direitos reservados. Operado por JD Investimentos Ltda. — CNPJ: 30.768.742/0001-22.',
   },
 
  /* ---- ENGLISH (en) - TARGETED AT GLOBAL/CHINESE SUPPLIERS ---- */
@@ -220,6 +222,8 @@ const translations = {
     contact_form_sending:  'Submitting...',
     contact_success_title: 'Details Received!',
     contact_success_msg:   'Thank you for registering your factory. Our commercial team will contact you within 24 hours.',
+    contact_form_tax_id:   'Tax ID / Business Registration',
+    footer_legal:          '© {year} VIATRADE Group. All rights reserved. Operated by JD Investimentos Ltda. — Tax ID: 30.768.742/0001-22.',
   },
 
   /* ---- 中文简体 — MANDARIM SIMPLIFICADO (zh) - TARGETED AT CHINESE FACTORIES ---- */
@@ -323,6 +327,8 @@ const translations = {
     contact_form_sending:  '提交中...',
     contact_success_title: '信息已收到！',
     contact_success_msg:   '感谢您登记工厂信息。我们的商业代表团队将在24小时内与您联系。',
+    contact_form_tax_id:   '企业注册号 / 纳税人识别号',
+    footer_legal:          '© {year} VIATRADE集团。版权所有。由 JD Investimentos Ltda. 运营 — 企业注册号：30.768.742/0001-22。',
   },
 };
 
@@ -368,11 +374,18 @@ const i18n = (() => {
     currentLang = lang;
     const dict = translations[lang];
 
-    /* --- 2a. Elementos com [data-i18n] --- */
+/* --- 2a. Elementos com [data-i18n] --- */
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       if (dict[key] !== undefined) {
-        el.textContent = dict[key];
+        let text = dict[key];
+        
+        // CORREÇÃO DE QA: Substituição dinâmica e inteligente do ano corrente
+        if (text.includes('{year}')) {
+          text = text.replace('{year}', new Date().getFullYear());
+        }
+        
+        el.textContent = text;
       }
     });
 
