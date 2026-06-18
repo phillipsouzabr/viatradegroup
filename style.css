@@ -1778,6 +1778,253 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================================
+   20b. PHONE COUNTRY SELECTOR
+   ============================================================ */
+.phone-field-wrapper {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  gap: 0;
+}
+
+.phone-country-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-3);
+  background: var(--color-off-white);
+  border: 1.5px solid var(--color-gray-200);
+  border-right: none;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+  height: 100%;
+  min-height: 46px;
+  font-family: var(--font-sans);
+}
+
+.phone-country-btn:hover {
+  background: var(--color-gray-100);
+  border-color: var(--color-gray-400);
+}
+
+.phone-country-btn:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  z-index: 1;
+}
+
+.phone-flag {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.phone-ddi {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text);
+  min-width: 36px;
+}
+
+.phone-chevron {
+  color: var(--color-gray-600);
+  transition: transform var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.phone-country-btn[aria-expanded="true"] .phone-chevron {
+  transform: rotate(180deg);
+}
+
+/* Dropdown */
+.phone-country-dropdown {
+  position: absolute;
+  inset-block-start: calc(100% + 4px);
+  inset-inline-start: 0;
+  z-index: 200;
+  width: 280px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--color-white);
+  border: 1.5px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  list-style: none;
+  display: none;
+  padding-block-end: var(--space-2);
+  overscroll-behavior: contain;
+}
+
+.phone-country-dropdown.is-open {
+  display: block;
+  animation: fadeInDown 0.15s ease both;
+}
+
+.phone-country-search-wrap {
+  position: sticky;
+  inset-block-start: 0;
+  background: var(--color-white);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.phone-country-search {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1.5px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-off-white);
+  outline: none;
+}
+
+.phone-country-search:focus {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(197, 155, 39, 0.12);
+}
+
+.phone-country-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  font-size: var(--fs-sm);
+  color: var(--color-text);
+}
+
+.phone-country-option:hover,
+.phone-country-option.is-selected {
+  background: var(--color-gold-subtle);
+}
+
+.phone-country-option.is-selected {
+  font-weight: var(--fw-semibold);
+}
+
+.phone-country-option-flag {
+  font-size: 1.1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.phone-country-option-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.phone-country-option-ddi {
+  font-size: var(--fs-xs);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+/* Input de número (direita do seletor) */
+.phone-number-input {
+  flex: 1;
+  font-family: var(--font-sans);
+  font-size: var(--fs-sm);
+  padding: 12px 16px;
+  border: 1.5px solid var(--color-gray-200);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  color: var(--color-text);
+  background-color: var(--color-off-white);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+  min-width: 0;
+}
+
+.phone-number-input:hover {
+  border-color: var(--color-gray-400);
+}
+
+.phone-number-input:focus {
+  outline: none;
+  border-color: var(--color-gold);
+  background-color: var(--color-white);
+  box-shadow: 0 0 0 3px rgba(197, 155, 39, 0.15);
+}
+
+/* Borda do wrapper sincroniza via focus-within */
+.phone-field-wrapper:focus-within .phone-country-btn {
+  border-color: var(--color-gold);
+}
+
+/* Mobile: dropdown ocupa largura total */
+@media (max-width: 480px) {
+  .phone-country-dropdown {
+    width: 100%;
+    left: 0;
+    right: 0;
+  }
+
+  .phone-country-btn {
+    padding: 0 var(--space-2);
+  }
+
+  .phone-ddi {
+    min-width: 28px;
+    font-size: var(--fs-xs);
+  }
+}
+
+
+/* ============================================================
+   20c. EMAIL VALIDATION
+   ============================================================ */
+.input-validation-wrap {
+  position: relative;
+}
+
+.input-validation-wrap input {
+  padding-right: 40px; /* espaço para o ícone */
+}
+
+.input-validation-icon {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 14px;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  line-height: 1;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+
+.input-error-msg {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--color-crimson);
+  margin-block-start: var(--space-1);
+  min-height: 16px; /* evita layout shift */
+  transition: opacity var(--transition-fast);
+}
+
+/* States no input de e-mail */
+#form-email.is-valid {
+  border-color: #2e7d32;
+  background-color: var(--color-white);
+}
+
+#form-email.is-invalid {
+  border-color: var(--color-crimson);
+  background-color: #fff8f8;
+}
+
+/* Campo CNPJ oculto por idioma — visível apenas no PT */
+#tax-id-group[hidden] {
+  display: none;
+}
+
+
+/* ============================================================
    21. FOOTER (Tarefa 8 - Finalizado)
    ============================================================ */
 .site-footer {
@@ -1798,7 +2045,8 @@ h1, h2, h3, h4, h5, h6 {
   font-size: var(--fs-xs);
   letter-spacing: 0.02em;
   line-height: var(--lh-relaxed);
-  color: rgba(255, 255, 255, 0.45);
+  /* Fix WCAG AA: 0.45 ficava em ~3.8:1 sobre #061829; 0.70 fica ~6.5:1 */
+  color: rgba(255, 255, 255, 0.70);
 }
 
 @media (max-width: 768px) {

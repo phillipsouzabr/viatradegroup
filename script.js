@@ -117,7 +117,8 @@ const translations = {
     contact_form_sending:  'Enviando...',
     contact_success_title: 'Solicitação Enviada!',
     contact_success_msg:   'Solicitação recebida! Nossa equipe de especialistas entrará em contato em até 24 horas.',
-    contact_form_tax_id:   'CNPJ',
+    contact_form_tax_id:      'CNPJ',
+    contact_form_phone_number: '(00) 00000-0000',
     footer_legal:          '© {year} VIATRADE Group. Todos os direitos reservados. Operado por JD Investimentos Ltda. — CNPJ: 30.768.742/0001-22.',
   },
 
@@ -222,7 +223,8 @@ const translations = {
     contact_form_sending:  'Submitting...',
     contact_success_title: 'Details Received!',
     contact_success_msg:   'Thank you for registering your factory. Our commercial team will contact you within 24 hours.',
-    contact_form_tax_id:   'Tax ID / Business Registration',
+    contact_form_tax_id:      'Tax ID / Business Registration',
+    contact_form_phone_number: 'e.g. 9876 5432',
     footer_legal:          '© {year} VIATRADE Group. All rights reserved. Operated by JD Investimentos Ltda. — Tax ID: 30.768.742/0001-22.',
   },
 
@@ -327,7 +329,8 @@ const translations = {
     contact_form_sending:  '提交中...',
     contact_success_title: '信息已收到！',
     contact_success_msg:   '感谢您登记工厂信息。我们的商业代表团队将在24小时内与您联系。',
-    contact_form_tax_id:   '企业注册号 / 纳税人识别号',
+    contact_form_tax_id:      '企业注册号 / 纳税人识别号',
+    contact_form_phone_number: '例：138 0000 0000',
     footer_legal:          '© {year} VIATRADE集团。版权所有。由 JD Investimentos Ltda. 运营 — 企业注册号：30.768.742/0001-22。',
   },
 };
@@ -418,7 +421,17 @@ const i18n = (() => {
       btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     });
 
-    /* --- 2f. Persiste escolha --- */
+    /* --- 2f. Campo CNPJ — visível apenas no PT --- */
+    const taxGroup = document.getElementById('tax-id-group');
+    const taxInput = document.getElementById('form-tax-id');
+    if (taxGroup) {
+      const isPT = lang === 'pt';
+      taxGroup.hidden = !isPT;
+      /* Remove/restaura required para não bloquear envio em EN/ZH */
+      if (taxInput) taxInput.required = isPT;
+    }
+
+    /* --- 2g. Persiste escolha --- */
     try {
       localStorage.setItem('viatrade_lang', lang);
     } catch (_) {
@@ -607,14 +620,284 @@ const contactForm = (() => {
 
 
 /* ============================================================
-   6. INICIALIZAÇÃO
+   6. CNPJ MASK
+   Aplica máscara 00.000.000/0000-00 em tempo real.
+   ============================================================ */
+const cnpjMask = (() => {
+  const input = document.getElementById('form-tax-id');
+  if (!input) return null;
+
+  function mask(v) {
+    v = v.replace(/\D/g, '').slice(0, 14);
+    if (v.length > 12) return v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+    if (v.length > 8)  return v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})/, '$1.$2.$3/$4');
+    if (v.length > 5)  return v.replace(/^(\d{2})(\d{3})(\d{3})/, '$1.$2.$3');
+    if (v.length > 2)  return v.replace(/^(\d{2})(\d{3})/, '$1.$2');
+    return v;
+  }
+
+  function init() {
+    input.addEventListener('input', () => {
+      const pos = input.selectionStart;
+      input.value = mask(input.value);
+      /* Reposiciona cursor após máscara (evita cursor pular para o fim) */
+      try { input.setSelectionRange(pos, pos); } catch (_) {}
+    });
+  }
+
+  return { init };
+})();
+
+
+/* ============================================================
+   7. EMAIL VALIDATION
+   Valida formato de e-mail em tempo real com feedback visual.
+   ============================================================ */
+const emailValidation = (() => {
+  const input = document.getElementById('form-email');
+  const icon  = document.getElementById('email-validation-icon');
+  const error = document.getElementById('email-error');
+  if (!input) return null;
+
+  /* RFC 5322 simplified — rejeita emails sem ponto no domínio */
+  const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  const ICON_VALID   = '✓';
+  const ICON_INVALID = '✕';
+
+  function validate() {
+    const val = input.value.trim();
+    if (!val) {
+      /* Vazio — limpa feedback */
+      input.classList.remove('is-valid', 'is-invalid');
+      if (icon)  icon.textContent = '';
+      if (error) error.textContent = '';
+      return;
+    }
+
+    const valid = RE_EMAIL.test(val);
+    input.classList.toggle('is-valid',   valid);
+    input.classList.toggle('is-invalid', !valid);
+
+    if (icon) {
+      icon.textContent = valid ? ICON_VALID : ICON_INVALID;
+      icon.style.color = valid ? '#2e7d32' : 'var(--color-crimson)';
+    }
+
+    if (error) {
+      /* Mensagem localizada */
+      const lang = i18n.getLang();
+      const msgs = {
+        pt: 'Por favor, insira um e-mail válido.',
+        en: 'Please enter a valid e-mail address.',
+        zh: '请输入有效的电子邮件地址。',
+      };
+      error.textContent = valid ? '' : (msgs[lang] || msgs.pt);
+    }
+  }
+
+  function init() {
+    input.addEventListener('blur',  validate);
+    input.addEventListener('input', () => {
+      /* Só mostra ícone verde/vermelho se usuário já saiu do campo ao menos 1x */
+      if (input.classList.contains('is-valid') || input.classList.contains('is-invalid')) {
+        validate();
+      }
+    });
+  }
+
+  return { init };
+})();
+
+
+/* ============================================================
+   8. PHONE COUNTRY SELECTOR
+   Lista de países com DDI, seleção, busca e máscara básica de número.
+   Zero dependências externas — compatível com China Firewall.
+   ============================================================ */
+const phoneSelector = (() => {
+  /* ---- Dados de países (os mais relevantes para o negócio + top globais) ---- */
+  const COUNTRIES = [
+    /* Topo fixo — os mais usados no contexto China-Brasil */
+    { code: 'BR', flag: '🇧🇷', name: 'Brasil',          ddi: '+55',  ph: '(00) 00000-0000' },
+    { code: 'CN', flag: '🇨🇳', name: '中国 (China)',      ddi: '+86',  ph: '138 0000 0000' },
+    { code: 'US', flag: '🇺🇸', name: 'United States',    ddi: '+1',   ph: '(555) 000-0000' },
+    /* Resto em ordem alfabética */
+    { code: 'AR', flag: '🇦🇷', name: 'Argentina',        ddi: '+54',  ph: '00 0000-0000' },
+    { code: 'AU', flag: '🇦🇺', name: 'Australia',        ddi: '+61',  ph: '0400 000 000' },
+    { code: 'AT', flag: '🇦🇹', name: 'Austria',          ddi: '+43',  ph: '0664 000000' },
+    { code: 'BE', flag: '🇧🇪', name: 'Belgium',          ddi: '+32',  ph: '0470 00 00 00' },
+    { code: 'BO', flag: '🇧🇴', name: 'Bolivia',          ddi: '+591', ph: '700 00000' },
+    { code: 'CA', flag: '🇨🇦', name: 'Canada',           ddi: '+1',   ph: '(555) 000-0000' },
+    { code: 'CL', flag: '🇨🇱', name: 'Chile',            ddi: '+56',  ph: '9 0000 0000' },
+    { code: 'CO', flag: '🇨🇴', name: 'Colombia',         ddi: '+57',  ph: '300 000 0000' },
+    { code: 'CR', flag: '🇨🇷', name: 'Costa Rica',       ddi: '+506', ph: '8000 0000' },
+    { code: 'DE', flag: '🇩🇪', name: 'Deutschland',      ddi: '+49',  ph: '0151 00000000' },
+    { code: 'EC', flag: '🇪🇨', name: 'Ecuador',          ddi: '+593', ph: '09 0000 0000' },
+    { code: 'ES', flag: '🇪🇸', name: 'España',           ddi: '+34',  ph: '600 000 000' },
+    { code: 'FR', flag: '🇫🇷', name: 'France',           ddi: '+33',  ph: '06 00 00 00 00' },
+    { code: 'GB', flag: '🇬🇧', name: 'United Kingdom',   ddi: '+44',  ph: '07700 000000' },
+    { code: 'HK', flag: '🇭🇰', name: '香港 (Hong Kong)', ddi: '+852', ph: '9000 0000' },
+    { code: 'IN', flag: '🇮🇳', name: 'India',            ddi: '+91',  ph: '98000 00000' },
+    { code: 'ID', flag: '🇮🇩', name: 'Indonesia',        ddi: '+62',  ph: '0812 0000 0000' },
+    { code: 'IL', flag: '🇮🇱', name: 'Israel',           ddi: '+972', ph: '050-000-0000' },
+    { code: 'IT', flag: '🇮🇹', name: 'Italia',           ddi: '+39',  ph: '320 000 0000' },
+    { code: 'JP', flag: '🇯🇵', name: '日本 (Japan)',      ddi: '+81',  ph: '090-0000-0000' },
+    { code: 'KR', flag: '🇰🇷', name: '한국 (Korea)',      ddi: '+82',  ph: '010-0000-0000' },
+    { code: 'MX', flag: '🇲🇽', name: 'México',           ddi: '+52',  ph: '55 0000 0000' },
+    { code: 'MY', flag: '🇲🇾', name: 'Malaysia',         ddi: '+60',  ph: '012-000 0000' },
+    { code: 'NL', flag: '🇳🇱', name: 'Nederland',        ddi: '+31',  ph: '06 00000000' },
+    { code: 'NZ', flag: '🇳🇿', name: 'New Zealand',      ddi: '+64',  ph: '021 000 0000' },
+    { code: 'NG', flag: '🇳🇬', name: 'Nigeria',          ddi: '+234', ph: '0800 000 0000' },
+    { code: 'NO', flag: '🇳🇴', name: 'Norge',            ddi: '+47',  ph: '900 00 000' },
+    { code: 'PK', flag: '🇵🇰', name: 'Pakistan',         ddi: '+92',  ph: '0300 0000000' },
+    { code: 'PA', flag: '🇵🇦', name: 'Panamá',           ddi: '+507', ph: '6000-0000' },
+    { code: 'PY', flag: '🇵🇾', name: 'Paraguay',         ddi: '+595', ph: '0961 000000' },
+    { code: 'PE', flag: '🇵🇪', name: 'Perú',             ddi: '+51',  ph: '900 000 000' },
+    { code: 'PH', flag: '🇵🇭', name: 'Philippines',      ddi: '+63',  ph: '0917 000 0000' },
+    { code: 'PL', flag: '🇵🇱', name: 'Polska',           ddi: '+48',  ph: '500 000 000' },
+    { code: 'PT', flag: '🇵🇹', name: 'Portugal',         ddi: '+351', ph: '912 000 000' },
+    { code: 'RU', flag: '🇷🇺', name: 'Россия (Russia)',  ddi: '+7',   ph: '900 000-00-00' },
+    { code: 'SA', flag: '🇸🇦', name: 'Saudi Arabia',     ddi: '+966', ph: '050 000 0000' },
+    { code: 'SG', flag: '🇸🇬', name: 'Singapore',        ddi: '+65',  ph: '8000 0000' },
+    { code: 'ZA', flag: '🇿🇦', name: 'South Africa',     ddi: '+27',  ph: '071 000 0000' },
+    { code: 'SE', flag: '🇸🇪', name: 'Sverige',          ddi: '+46',  ph: '070-000 00 00' },
+    { code: 'CH', flag: '🇨🇭', name: 'Schweiz',          ddi: '+41',  ph: '079 000 00 00' },
+    { code: 'TW', flag: '🇹🇼', name: '台灣 (Taiwan)',     ddi: '+886', ph: '09 0000 0000' },
+    { code: 'TH', flag: '🇹🇭', name: 'Thailand',         ddi: '+66',  ph: '089 000 0000' },
+    { code: 'TR', flag: '🇹🇷', name: 'Türkiye',          ddi: '+90',  ph: '0532 000 0000' },
+    { code: 'UA', flag: '🇺🇦', name: 'Україна (Ukraine)', ddi: '+380', ph: '050 000 0000' },
+    { code: 'AE', flag: '🇦🇪', name: 'UAE',              ddi: '+971', ph: '050 000 0000' },
+    { code: 'UY', flag: '🇺🇾', name: 'Uruguay',          ddi: '+598', ph: '094 000 000' },
+    { code: 'VE', flag: '🇻🇪', name: 'Venezuela',        ddi: '+58',  ph: '0412-0000000' },
+    { code: 'VN', flag: '🇻🇳', name: 'Việt Nam',         ddi: '+84',  ph: '090 000 00 00' },
+  ];
+
+  /* Elementos do DOM */
+  const btn         = document.getElementById('phone-country-btn');
+  const dropdown    = document.getElementById('phone-country-dropdown');
+  const flagEl      = document.getElementById('phone-flag');
+  const ddiEl       = document.getElementById('phone-ddi');
+  const searchInput = document.getElementById('phone-country-search');
+  const numberInput = document.getElementById('form-phone');
+  const hiddenDdi   = document.getElementById('form-phone-ddi');
+
+  if (!btn || !dropdown || !numberInput) return null;
+
+  let selected = COUNTRIES[0]; /* Brasil como padrão */
+  let isOpen   = false;
+
+  /* ---- Renderiza lista de países ---- */
+  function renderList(filter = '') {
+    /* Remove opções antigas (mantém o li de busca) */
+    dropdown.querySelectorAll('.phone-country-option').forEach(el => el.remove());
+
+    const q = filter.toLowerCase();
+    const filtered = q
+      ? COUNTRIES.filter(c =>
+          c.name.toLowerCase().includes(q) ||
+          c.ddi.includes(q) ||
+          c.code.toLowerCase().includes(q)
+        )
+      : COUNTRIES;
+
+    const fragment = document.createDocumentFragment();
+    filtered.forEach(country => {
+      const li = document.createElement('li');
+      li.className = 'phone-country-option';
+      li.setAttribute('role', 'option');
+      li.setAttribute('data-code', country.code);
+      if (country.code === selected.code) li.classList.add('is-selected');
+      li.innerHTML = `
+        <span class="phone-country-option-flag" aria-hidden="true">${country.flag}</span>
+        <span class="phone-country-option-name">${country.name}</span>
+        <span class="phone-country-option-ddi">${country.ddi}</span>
+      `;
+      li.addEventListener('click', () => selectCountry(country));
+      fragment.appendChild(li);
+    });
+    dropdown.appendChild(fragment);
+  }
+
+  /* ---- Seleciona país ---- */
+  function selectCountry(country) {
+    selected = country;
+    if (flagEl)    flagEl.textContent  = country.flag;
+    if (ddiEl)     ddiEl.textContent   = country.ddi;
+    if (hiddenDdi) hiddenDdi.value     = country.ddi;
+    if (numberInput) {
+      numberInput.placeholder = country.ph;
+      numberInput.focus();
+    }
+    close();
+    renderList(searchInput ? searchInput.value : '');
+  }
+
+  /* ---- Abre/fecha dropdown ---- */
+  function open() {
+    isOpen = true;
+    dropdown.classList.add('is-open');
+    btn.setAttribute('aria-expanded', 'true');
+    if (searchInput) {
+      searchInput.value = '';
+      renderList('');
+      setTimeout(() => searchInput.focus(), 50);
+    }
+  }
+
+  function close() {
+    isOpen = false;
+    dropdown.classList.remove('is-open');
+    btn.setAttribute('aria-expanded', 'false');
+  }
+
+  function toggle() { isOpen ? close() : open(); }
+
+  /* ---- Init ---- */
+  function init() {
+    /* Renderiza lista inicial */
+    renderList();
+
+    /* Botão principal */
+    btn.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
+
+    /* Busca */
+    if (searchInput) {
+      searchInput.addEventListener('input', () => renderList(searchInput.value));
+      /* Evita que clique no search feche o dropdown */
+      searchInput.addEventListener('click', (e) => e.stopPropagation());
+    }
+
+    /* Fecha ao clicar fora */
+    document.addEventListener('click', (e) => {
+      if (isOpen && !dropdown.contains(e.target) && e.target !== btn) close();
+    });
+
+    /* Fecha com ESC */
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen) { close(); btn.focus(); }
+    });
+
+    /* Define o placeholder inicial */
+    if (numberInput) numberInput.placeholder = selected.ph;
+  }
+
+  return { init };
+})();
+
+
+/* ============================================================
+   9. INICIALIZAÇÃO
    FIX: Guards para módulos que podem retornar null
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
   i18n.init();
-  headerScroll?.init();  /* Guard: null se #site-header não existir */
-  mobileMenu?.init();    /* Guard: null se #hamburger ou #main-nav não existirem */
-  contactForm?.init();   /* Guard: null se #contact-form não existir */
+  headerScroll?.init();
+  mobileMenu?.init();
+  contactForm?.init();
+  cnpjMask?.init();
+  emailValidation?.init();
+  phoneSelector?.init();
 
   /* Expõe i18n globalmente para módulos futuros */
   window.VT = {

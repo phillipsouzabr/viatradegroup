@@ -598,12 +598,24 @@
 
               <div class="form-group">
                 <label for="form-email" data-i18n="contact_form_email">E-mail Corporativo</label>
-                <input type="email" id="form-email" name="email" required data-i18n-placeholder="contact_form_email" placeholder="E-mail Corporativo">
+                <div class="input-validation-wrap">
+                  <input type="email" id="form-email" name="email" required
+                         data-i18n-placeholder="contact_form_email"
+                         placeholder="email@empresa.com"
+                         autocomplete="email"
+                         inputmode="email">
+                  <span class="input-validation-icon" aria-hidden="true" id="email-validation-icon"></span>
+                </div>
+                <span class="input-error-msg" id="email-error" role="alert" aria-live="polite"></span>
               </div>
 
-              <div class="form-group">
+              <div class="form-group" id="tax-id-group" data-pt-only="true">
                 <label for="form-tax-id" data-i18n="contact_form_tax_id">CNPJ</label>
-                <input type="text" id="form-tax-id" name="tax_id" required data-i18n-placeholder="contact_form_tax_id" placeholder="CNPJ">
+                <input type="text" id="form-tax-id" name="tax_id"
+                       data-i18n-placeholder="contact_form_tax_id"
+                       placeholder="00.000.000/0000-00"
+                       maxlength="18"
+                       autocomplete="off">
               </div>
 
               <div class="form-group">
@@ -612,8 +624,29 @@
               </div>
 
               <div class="form-group">
-                <label for="form-phone" data-i18n="contact_form_phone">WhatsApp ou WeChat (com DDI)</label>
-                <input type="text" id="form-phone" name="phone" required data-i18n-placeholder="contact_form_phone" placeholder="WhatsApp ou WeChat (com DDI)">
+                <label for="form-phone" data-i18n="contact_form_phone">WhatsApp ou WeChat</label>
+                <div class="phone-field-wrapper">
+                  <!-- Seletor de país -->
+                  <button type="button" class="phone-country-btn" id="phone-country-btn" aria-label="Selecionar país" aria-expanded="false" aria-haspopup="listbox">
+                    <span class="phone-flag" id="phone-flag">🇧🇷</span>
+                    <span class="phone-ddi" id="phone-ddi">+55</span>
+                    <svg class="phone-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <!-- Dropdown de países -->
+                  <ul class="phone-country-dropdown" id="phone-country-dropdown" role="listbox" aria-label="Países">
+                    <li class="phone-country-search-wrap">
+                      <input type="text" class="phone-country-search" id="phone-country-search" placeholder="Buscar país..." autocomplete="off" aria-label="Buscar país">
+                    </li>
+                    <!-- países populados via JS -->
+                  </ul>
+                  <!-- Campo numérico -->
+                  <input type="tel" id="form-phone" name="phone" required
+                         class="phone-number-input"
+                         data-i18n-placeholder="contact_form_phone_number"
+                         placeholder="(00) 00000-0000"
+                         autocomplete="tel-national">
+                  <input type="hidden" id="form-phone-ddi" name="phone_ddi" value="+55">
+                </div>
               </div>
 
               <div class="form-group">
