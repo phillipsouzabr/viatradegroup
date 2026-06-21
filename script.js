@@ -486,6 +486,18 @@ const i18n = (() => {
       if (taxInput) taxInput.required = isPT;
     }
 
+    /* --- 2g. WeChat Hero Panel — visível APENAS em ZH, controlado por JS --- */
+    const wechatPanel = document.getElementById('hero-wechat-panel');
+    if (wechatPanel) {
+      if (lang === 'zh') {
+        wechatPanel.removeAttribute('hidden');
+        wechatPanel.style.display = 'flex';
+      } else {
+        wechatPanel.setAttribute('hidden', '');
+        wechatPanel.style.display = 'none';
+      }
+    }
+
     /* --- 2g. Re-renderiza FAQ com abordagem do idioma */
     if (typeof faqModule !== 'undefined' && faqModule.render) {
       faqModule.render(lang);

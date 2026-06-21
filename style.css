@@ -806,7 +806,6 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── WeChat Hero Card (ZH only) — layout vertical ── */
 .hero-wechat {
-  display: none !important; /* oculto por padrão em PT e EN */
   animation: heroFadeUp 0.5s ease both;
 }
 
@@ -2180,38 +2179,32 @@ h1, h2, h3, h4, h5, h6 {
 
 
 /* ============================================================
-   20d. HERO WECHAT PANEL — seletores ZH e layout 2 colunas
-   Os estilos base do componente já existem na seção do Hero (linha ~798).
-   Aqui apenas: ocultar por padrão + ativar em ZH + layout responsivo.
+   20d. HERO WECHAT PANEL
+   Visibilidade controlada 100% por JS (applyLang).
+   CSS aqui apenas para estilos visuais e layout quando visível.
    ============================================================ */
 
-/* Painel invisível em PT e EN — reforço com !important */
+/* Painel oculto por padrão — JS remove o hidden quando lang=zh */
 .hero-wechat {
-  display: none !important;
-}
-
-/* Painel visível APENAS em ZH — sobrescreve o none acima */
-html[lang="zh-Hans"] .hero-wechat {
-  display: flex !important;
+  display: none;
   flex-shrink: 0;
 }
 
-/* Hero vira 2 colunas lado a lado em ZH no desktop */
-html[lang="zh-Hans"] .hero-inner {
+/* Quando JS remove [hidden] e seta display:flex */
+.hero-wechat:not([hidden]) {
+  display: flex;
+}
+
+/* Layout do hero em 2 colunas quando painel está visível */
+.hero-wechat:not([hidden]) ~ .hero-content,
+.hero-inner:has(.hero-wechat:not([hidden])) {
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: var(--space-12);
 }
 
-/* Texto do hero alinha à esquerda quando tem painel lateral */
-html[lang="zh-Hans"] .hero-content {
-  text-align: left;
-  align-items: flex-start;
-  max-width: 560px;
-}
-
-/* Estilos exclusivos do painel Hero (não conflitam com wechat-box do footer) */
+/* Estilos visuais do painel */
 .hero-wechat-qr-wrap {
   background: var(--color-white);
   border-radius: var(--radius-md);
@@ -2227,19 +2220,9 @@ html[lang="zh-Hans"] .hero-content {
   letter-spacing: 0.04em;
 }
 
-/* Mobile ZH: empilha verticalmente */
+/* Mobile — empilha verticalmente */
 @media (max-width: 768px) {
-  html[lang="zh-Hans"] .hero-inner {
-    flex-direction: column;
-  }
-
-  html[lang="zh-Hans"] .hero-content {
-    text-align: center;
-    align-items: center;
-    max-width: 100%;
-  }
-
-  html[lang="zh-Hans"] .hero-wechat {
+  .hero-wechat:not([hidden]) {
     width: 100%;
     justify-content: center;
   }
