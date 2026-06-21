@@ -806,11 +806,12 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── WeChat Hero Card (ZH only) — layout vertical ── */
 .hero-wechat {
+  display: none !important; /* oculto por padrão em PT e EN */
   animation: heroFadeUp 0.5s ease both;
 }
 
 .hero-wechat[hidden] {
-  display: none;
+  display: none !important;
 }
 
 /* Inner: coluna vertical, label em cima → QR → hint embaixo */
@@ -2184,14 +2185,14 @@ h1, h2, h3, h4, h5, h6 {
    Aqui apenas: ocultar por padrão + ativar em ZH + layout responsivo.
    ============================================================ */
 
-/* Painel invisível em PT e EN — sobrescreve o display herdado */
+/* Painel invisível em PT e EN — reforço com !important */
 .hero-wechat {
-  display: none;
+  display: none !important;
 }
 
-/* Painel visível em ZH */
+/* Painel visível APENAS em ZH — sobrescreve o none acima */
 html[lang="zh-Hans"] .hero-wechat {
-  display: flex;
+  display: flex !important;
   flex-shrink: 0;
 }
 
