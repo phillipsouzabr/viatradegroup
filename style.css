@@ -42,7 +42,7 @@
   --color-gray-600:      #5A6475;
   --color-gray-800:      #2C3547;
   --color-text:          #1A2535;
-  --color-text-muted:    #5A6475;
+  --color-text-muted:    #4A5568;  /* WCAG AA: ~5.9:1 sobre fundo branco */
 
   /* Header */
   --header-h:            76px;
@@ -2334,7 +2334,7 @@ h1, h2, h3, h4, h5, h6 {
 .faq-answer p {
   font-size: var(--fs-sm);
   line-height: var(--lh-relaxed);
-  color: var(--color-text-muted, #6B7A8D);
+  color: var(--color-text-muted, #4A5568);
   border-top: 1px solid var(--color-surface-2, #E2E8F0);
   padding-top: var(--space-4);
 }
