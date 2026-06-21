@@ -343,7 +343,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: var(--fw-semibold);
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.82);
   display: block;
   margin-top: 1px;
 }
@@ -457,7 +457,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: var(--fs-xs);
   font-weight: var(--fw-semibold);
   letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.60);
+  color: rgba(255, 255, 255, 0.78);
   padding: 5px 10px;
   border-radius: var(--radius-full);
   cursor: pointer;
@@ -787,7 +787,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: clamp(var(--fs-base), 2vw, var(--fs-md));
   font-weight: var(--fw-regular);
   line-height: var(--lh-relaxed);
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.82);
   max-width: 660px;       /* Ligeiramente alargado de 620px para melhor distribuição das palavras */
   text-wrap: balance;     /* Distribui as palavras simetricamente entre as linhas */
   margin-inline: auto;    /* Mantém a centralização perfeita do bloco de texto */
@@ -881,7 +881,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Hint: 扫码与我们立即沟通 */
 .hero-wechat-hint {
   font-size: var(--fs-sm);
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.82);
   font-family: var(--font-zh);
   letter-spacing: 0.03em;
 }
@@ -889,7 +889,7 @@ h1, h2, h3, h4, h5, h6 {
 /* sub alias — compatibilidade com markup antigo */
 .hero-wechat-sub {
   font-size: var(--fs-sm);
-  color: rgba(255, 255, 255, 0.60);
+  color: rgba(255, 255, 255, 0.78);
   font-family: var(--font-zh);
 }
 
@@ -1008,7 +1008,7 @@ h1, h2, h3, h4, h5, h6 {
 .stat-label {
   font-size: var(--fs-xs);
   font-weight: var(--fw-medium);
-  color: rgba(255, 255, 255, 0.48);
+  color: rgba(255, 255, 255, 0.80);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   text-align: center;
@@ -1386,7 +1386,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .services .section-subtitle {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.82);
 }
 
 /* ============================================================
@@ -1557,7 +1557,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .sectors .section-subtitle {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.82);
 }
 
 /* ============================================================
@@ -2214,7 +2214,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .hero-wechat-hint {
   font-size: var(--fs-xs);
-  color: rgba(255, 255, 255, 0.60);
+  color: rgba(255, 255, 255, 0.78);
   text-align: center;
   font-family: var(--font-zh);
   letter-spacing: 0.04em;
