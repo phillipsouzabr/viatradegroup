@@ -47,10 +47,10 @@
   /* Header */
   --header-h:            76px;
   --header-h-scroll:     66px;
-  --header-bg:           transparent;
-  --header-bg-scroll:    rgba(10, 37, 64, 0.97);
-  --header-shadow-scroll: 0 2px 24px rgba(0, 0, 0, 0.25);
-  --header-border-scroll: 1px solid rgba(197, 155, 39, 0.15);
+  --header-bg:           #0A2540;
+  --header-bg-scroll:    #061829;
+  --header-shadow-scroll: 0 2px 24px rgba(0, 0, 0, 0.35);
+  --header-border-scroll: 1px solid rgba(197, 155, 39, 0.20);
 
   /* Typography */
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont,
@@ -255,11 +255,22 @@ h1, h2, h3, h4, h5, h6 {
 .header-inner {
   display: flex;
   align-items: center;
-  gap: var(--space-8);
   height: 100%;
   max-width: var(--max-w-content);
   margin-inline: auto;
   padding-inline: var(--page-px);
+  /* Três zonas: logo | nav | controles */
+  gap: var(--space-4);
+  position: relative;
+  z-index: 1001; /* acima de qualquer elemento da página */
+}
+
+/* Nav ocupa o espaço do meio, centralizado */
+#main-nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 0; /* evita overflow */
 }
 
 /* Linha dourada decorativa no topo do header */
@@ -351,9 +362,7 @@ h1, h2, h3, h4, h5, h6 {
 /* ============================================================
    6. NAVIGATION
    ============================================================ */
-#main-nav {
-  margin-inline-start: auto;
-}
+/* #main-nav flex properties now set inside .header-inner block above */
 
 .nav-list {
   display: flex;
@@ -434,36 +443,44 @@ h1, h2, h3, h4, h5, h6 {
 .lang-switcher {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: 0;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: var(--radius-full);
-  padding: 3px 10px;
+  padding: 3px;
+  position: relative;
+  z-index: 10; /* acima de qualquer overlay do hero */
 }
 
 .lang-btn {
   font-size: var(--fs-xs);
   font-weight: var(--fw-semibold);
-  letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.55);
-  padding: 2px 4px;
-  border-radius: var(--radius-sm);
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.60);
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
   transition: color var(--transition-fast), background var(--transition-fast);
+  line-height: 1;
+  border: none;
+  background: none;
+  font-family: var(--font-sans);
 }
 
 .lang-btn:hover {
   color: var(--color-white);
+  background: rgba(255,255,255,0.10);
 }
 
 .lang-btn.active {
-  color: var(--color-gold);
+  color: var(--color-navy-deep);
+  background: var(--color-gold);
+  font-weight: var(--fw-bold);
 }
 
 .lang-divider {
-  color: rgba(255, 255, 255, 0.2);
-  font-size: var(--fs-xs);
-  user-select: none;
+  display: none; /* pill unificada não precisa de divisor */
 }
 
 
@@ -546,15 +563,13 @@ h1, h2, h3, h4, h5, h6 {
     --header-h-scroll: 60px;
   }
 
-  /* Fix: logo takes natural space, lang-switcher pushes right,
-     hamburger follows with a small gap — no double auto-margin conflict */
   .header-inner {
     gap: var(--space-3);
   }
 
   #main-nav {
-    /* Nav sai do fluxo normal — não participa do flex row */
-    margin-inline-start: 0;
+    /* Sai do fluxo flex — overlay lateral em mobile */
+    flex: none;
     position: fixed;
     inset-block-start: var(--header-h);
     inset-inline: 0;
@@ -566,25 +581,25 @@ h1, h2, h3, h4, h5, h6 {
     transition: transform var(--transition-slow);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    /* Anula o justify-content do desktop */
+    justify-content: flex-start;
   }
 
   #main-nav.is-open {
     transform: translateX(0);
   }
 
-  /* Lang switcher empurra-se para a direita */
+  /* Logo fica natural, lang-switcher empurra tudo para a direita */
   .lang-switcher {
     margin-inline-start: auto;
-    /* Aumenta área de toque */
-    padding: 6px 12px;
+    flex-shrink: 0;
   }
 
-  /* Hamburger segue o lang-switcher com gap pequeno */
   .hamburger {
     display: flex;
-    margin-inline-start: 0;
-    width: 44px;  /* touch target */
-    height: 44px; /* touch target */
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
   }
 
   .nav-list {
@@ -596,7 +611,7 @@ h1, h2, h3, h4, h5, h6 {
   .nav-link {
     font-size: var(--fs-md);
     padding: var(--space-3) var(--space-4);
-    min-height: 44px;             /* touch target */
+    min-height: 44px;
     display: flex;
     align-items: center;
     width: 100%;
@@ -616,7 +631,6 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--color-navy-deep);
   }
 
-  /* Botões de idioma maiores no mobile */
   .lang-btn {
     padding: 4px 6px;
     min-height: 32px;
@@ -788,6 +802,125 @@ h1, h2, h3, h4, h5, h6 {
   gap: var(--space-4);
   justify-content: center;
   animation: heroFadeUp 0.6s ease 0.55s both;
+}
+
+/* ── WeChat Hero Card (ZH only) — layout vertical ── */
+.hero-wechat {
+  animation: heroFadeUp 0.5s ease both;
+}
+
+.hero-wechat[hidden] {
+  display: none;
+}
+
+/* Inner: coluna vertical, label em cima → QR → hint embaixo */
+.hero-wechat-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(197, 155, 39, 0.35);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color var(--transition-base), background var(--transition-base);
+  text-align: center;
+}
+
+.hero-wechat-inner:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(197, 155, 39, 0.60);
+}
+
+/* Label: 微信直接联系 */
+.hero-wechat-label {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+  color: var(--color-gold);
+  letter-spacing: 0.04em;
+  font-family: var(--font-zh);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Ícone WeChat verde antes do label */
+.hero-wechat-label::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  background-color: #07C160;
+  border-radius: 5px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M8.5 11.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm5 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'/%3E%3Cpath d='M3 9.5C3 6.46 6.13 4 10 4s7 2.46 7 5.5c0 .28-.02.56-.07.83A5.5 5.5 0 0 1 21 15.5c0 1.47-.6 2.8-1.57 3.76L20 21l-2.3-1.15A6.2 6.2 0 0 1 15.5 20a5.5 5.5 0 0 1-5.45-4.83C9.7 15.11 9.36 15 9 15c-3.87 0-6-2.69-6-5.5z'/%3E%3C/svg%3E");
+  background-size: 14px 14px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Wrapper branco do QR — quadrado limpo */
+.hero-wechat-qr-wrap {
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* QR image — maior */
+.hero-wechat-qr {
+  display: block;
+  width: 220px;
+  height: 220px;
+  border-radius: var(--radius-sm);
+  object-fit: contain;
+}
+
+/* Hint: 扫码与我们立即沟通 */
+.hero-wechat-hint {
+  font-size: var(--fs-sm);
+  color: rgba(255, 255, 255, 0.65);
+  font-family: var(--font-zh);
+  letter-spacing: 0.03em;
+}
+
+/* sub alias — compatibilidade com markup antigo */
+.hero-wechat-sub {
+  font-size: var(--fs-sm);
+  color: rgba(255, 255, 255, 0.60);
+  font-family: var(--font-zh);
+}
+
+/* Ícone WeChat decorativo inline — verde característico */
+.hero-wechat-label::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-inline-end: var(--space-2);
+  vertical-align: middle;
+  background-color: #07C160;
+  border-radius: 4px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M8.5 11.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm5 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z'/%3E%3Cpath d='M3 9.5C3 6.46 6.13 4 10 4s7 2.46 7 5.5c0 .28-.02.56-.07.83A5.5 5.5 0 0 1 21 15.5c0 1.47-.6 2.8-1.57 3.76L20 21l-2.3-1.15A6.2 6.2 0 0 1 15.5 20a5.5 5.5 0 0 1-5.45-4.83C9.7 15.11 9.36 15 9 15c-3.87 0-6-2.69-6-5.5z'/%3E%3C/svg%3E");
+  background-size: 13px 13px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+@media (max-width: 480px) {
+  .hero-wechat-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+  }
+
+  .hero-wechat-text {
+    align-items: center;
+    text-align: center;
+  }
 }
 
 /* ── Button system (reusable across all sections) ── */
@@ -1987,7 +2120,8 @@ h1, h2, h3, h4, h5, h6 {
   padding-right: 40px; /* espaço para o ícone */
 }
 
-.input-validation-icon {
+.input-validation-icon,
+.input-val-icon {
   position: absolute;
   inset-block-start: 50%;
   inset-inline-end: 14px;
@@ -2018,11 +2152,203 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #fff8f8;
 }
 
+/* Campo obrigatório vazio ao tentar enviar */
+.field-error {
+  border-color: var(--color-crimson) !important;
+  background-color: #fff8f8 !important;
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%       { transform: translateX(-6px); }
+  75%       { transform: translateX(6px); }
+}
+
+/* Remove erro ao começar a digitar */
+.field-error:focus {
+  border-color: var(--color-gold) !important;
+  background-color: var(--color-white) !important;
+  animation: none;
+}
+
 /* Campo CNPJ oculto por idioma — visível apenas no PT */
 #tax-id-group[hidden] {
   display: none;
 }
 
+
+/* ============================================================
+   20d. HERO WECHAT PANEL — seletores ZH e layout 2 colunas
+   Os estilos base do componente já existem na seção do Hero (linha ~798).
+   Aqui apenas: ocultar por padrão + ativar em ZH + layout responsivo.
+   ============================================================ */
+
+/* Painel invisível em PT e EN — sobrescreve o display herdado */
+.hero-wechat {
+  display: none;
+}
+
+/* Painel visível em ZH */
+html[lang="zh-Hans"] .hero-wechat {
+  display: flex;
+  flex-shrink: 0;
+}
+
+/* Hero vira 2 colunas lado a lado em ZH no desktop */
+html[lang="zh-Hans"] .hero-inner {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+}
+
+/* Texto do hero alinha à esquerda quando tem painel lateral */
+html[lang="zh-Hans"] .hero-content {
+  text-align: left;
+  align-items: flex-start;
+  max-width: 560px;
+}
+
+/* Estilos exclusivos do painel Hero (não conflitam com wechat-box do footer) */
+.hero-wechat-qr-wrap {
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.30);
+}
+
+.hero-wechat-hint {
+  font-size: var(--fs-xs);
+  color: rgba(255, 255, 255, 0.60);
+  text-align: center;
+  font-family: var(--font-zh);
+  letter-spacing: 0.04em;
+}
+
+/* Mobile ZH: empilha verticalmente */
+@media (max-width: 768px) {
+  html[lang="zh-Hans"] .hero-inner {
+    flex-direction: column;
+  }
+
+  html[lang="zh-Hans"] .hero-content {
+    text-align: center;
+    align-items: center;
+    max-width: 100%;
+  }
+
+  html[lang="zh-Hans"] .hero-wechat {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+/* ============================================================
+   22. FAQ SECTION
+   ============================================================ */
+.faq-section {
+  padding-block: var(--space-20);
+  background: var(--color-surface);
+}
+
+.faq-grid {
+  margin-block-start: var(--space-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 860px;
+  margin-inline: auto;
+}
+
+/* Accordion item */
+.faq-item {
+  background: var(--color-white);
+  border: 1.5px solid var(--color-surface-2, #E2E8F0);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.faq-item[open] {
+  border-color: var(--color-gold);
+  box-shadow: 0 4px 20px rgba(197, 155, 39, 0.12);
+}
+
+/* Question (summary) */
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  color: var(--color-navy);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.faq-question::-webkit-details-marker { display: none; }
+
+.faq-question::after {
+  content: '';
+  display: block;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  background-color: var(--color-navy);
+  border-radius: 50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 12px;
+  transition: transform var(--transition-base), background-color var(--transition-base);
+}
+
+.faq-item[open] .faq-question {
+  color: var(--color-gold-dim, #8B6E1A);
+}
+
+.faq-item[open] .faq-question::after {
+  transform: rotate(180deg);
+  background-color: var(--color-gold);
+}
+
+.faq-question:hover {
+  background: var(--color-surface);
+}
+
+/* Answer */
+.faq-answer {
+  padding: 0 var(--space-6) var(--space-5);
+}
+
+.faq-answer p {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-relaxed);
+  color: var(--color-text-muted, #6B7A8D);
+  border-top: 1px solid var(--color-surface-2, #E2E8F0);
+  padding-top: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .faq-section {
+    padding-block: var(--space-12);
+  }
+
+  .faq-question {
+    font-size: var(--fs-base);
+    padding: var(--space-4) var(--space-4);
+  }
+
+  .faq-answer {
+    padding: 0 var(--space-4) var(--space-4);
+  }
+}
 
 /* ============================================================
    21. FOOTER (Tarefa 8 - Finalizado)
