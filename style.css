@@ -2220,11 +2220,31 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.04em;
 }
 
-/* Mobile — empilha verticalmente */
+/* Mobile — empilha verticalmente, QR centralizado abaixo do texto */
 @media (max-width: 768px) {
+  /* Desfaz o row do desktop — volta para coluna */
+  .hero-inner:has(.hero-wechat:not([hidden])) {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Texto volta ao centro */
+  .hero-inner:has(.hero-wechat:not([hidden])) .hero-content {
+    text-align: center;
+    align-items: center;
+    max-width: 100%;
+  }
+
+  /* QR ocupa largura total e centraliza */
   .hero-wechat:not([hidden]) {
     width: 100%;
     justify-content: center;
+  }
+
+  /* QR menor no mobile para não vazar */
+  .hero-wechat-qr {
+    width: 180px;
+    height: 180px;
   }
 }
 
