@@ -732,12 +732,11 @@ const cnpjMask = (() => {
       const diff = input.value.length - raw.length;
       try { input.setSelectionRange(pos + diff, pos + diff); } catch (_) {}
     });
-    /* Impede colagem de texto não-numérico */
-    input.addEventListener('paste', (e) => {
-      e.preventDefault();
-      const text = (e.clipboardData || window.clipboardData).getData('text');
-      const digits = text.replace(/\D/g, '').slice(0, 14);
-      input.value = mask(digits);
+    /* Permite colar — filtra não-dígitos após colagem (sem bloquear o evento) */
+    input.addEventListener('paste', () => {
+      setTimeout(() => {
+        input.value = mask(input.value);
+      }, 0);
     });
   }
   return { init };
